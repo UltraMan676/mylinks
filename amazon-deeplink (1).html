@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirecting to Amazon...</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f7f3ee;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 2px 40px rgba(0,0,0,0.07);
+  }
+
+  .amazon-logo {
+    width: 110px;
+    margin-bottom: 1.5rem;
+  }
+
+  .product-img {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    border-radius: 16px;
+    background: #f7f3ee;
+    padding: 12px;
+    margin-bottom: 1.25rem;
+  }
+
+  .product-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .product-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: #B12704;
+    margin-bottom: 1.5rem;
+  }
+
+  .status-text {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 1.25rem;
+  }
+
+  .loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f0e8d6;
+    border-top-color: #FF9900;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1.5rem;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 100px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    margin-bottom: 10px;
+    transition: opacity 0.15s;
+  }
+
+  .btn:active { opacity: 0.85; }
+
+  .btn-app {
+    background: #FF9900;
+    color: #fff;
+  }
+
+  .btn-web {
+    background: #f7f3ee;
+    color: #333;
+  }
+
+  .note {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 1.25rem;
+    line-height: 1.6;
+  }
+
+  /* Success state */
+  .success-icon {
+    font-size: 48px;
+    margin-bottom: 0.75rem;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Amazon logo SVG wordmark -->
+  <svg class="amazon-logo" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <text x="10" y="42" font-family="Arial Black, sans-serif" font-size="38" font-weight="900" fill="#FF9900">amazon</text>
+  </svg>
+
+  <!--
+    ============================================================
+    CUSTOMIZE THESE 3 LINES FOR EACH PRODUCT:
+    ============================================================
+  -->
+  <script>
+    // 1. Your affiliate link (the amzn.to link)
+    var AFFILIATE_URL = "https://amzn.to/4nnsGm3";
+
+    // 2. Product display name
+    var PRODUCT_NAME = "Check Amazon for Details";
+
+    // 3. Product price to show
+    var PRODUCT_PRICE = "";
+
+    // 4. Product image URL (right-click any Amazon product image → copy image address)
+    var PRODUCT_IMAGE = "";
+  </script>
+  <!--
+    ============================================================
+  -->
+
+  <img id="prodImg" class="product-img" src="" alt="Product" onerror="this.style.display='none'">
+  <div class="product-name" id="prodName"></div>
+  <div class="product-price" id="prodPrice"></div>
+
+  <div class="loader" id="loader"></div>
+  <p class="status-text" id="statusText">Opening Amazon app…</p>
+
+  <a class="btn btn-app" id="btnApp" href="#" style="display:none">
+    Open in Amazon App
+  </a>
+  <a class="btn btn-web" id="btnWeb" href="#" style="display:none">
+    Open in Browser Instead
+  </a>
+
+  <p class="note">
+    You will be redirected to Amazon.in.<br>
+    Your data is safe — this is an official Amazon affiliate link.
+  </p>
+
+</div>
+
+<script>
+  // Fill in product details
+  document.getElementById('prodName').textContent = PRODUCT_NAME;
+  document.getElementById('prodPrice').textContent = PRODUCT_PRICE;
+  if (PRODUCT_IMAGE) {
+    document.getElementById('prodImg').src = PRODUCT_IMAGE;
+  } else {
+    document.getElementById('prodImg').style.display = 'none';
+  }
+
+  // Set both buttons to the affiliate URL
+  document.getElementById('btnApp').href = AFFILIATE_URL;
+  document.getElementById('btnWeb').href = AFFILIATE_URL;
+
+  // Deep link magic:
+  // Try to open Amazon app via intent (Android) or universal link (iOS)
+  // The affiliate URL itself (amzn.to) is recognized by Amazon app as a universal link on iOS
+  // On Android, we use the intent:// scheme to force app open
+
+  var isAndroid = /Android/i.test(navigator.userAgent);
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  function showButtons() {
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('statusText').textContent = "Tap below to continue:";
+    document.getElementById('btnApp').style.display = 'block';
+    document.getElementById('btnWeb').style.display = 'block';
+  }
+
+  function tryDeepLink() {
+    if (isAndroid) {
+      // Android intent: open Amazon app directly, fallback to browser
+      // Extract the short code from amzn.to link or use full URL
+      var intentURL = "intent://" + AFFILIATE_URL.replace(/^https?:\/\//, '')
+        + "#Intent;scheme=https;package=in.amazon.mShop.android.shopping;S.browser_fallback_url="
+        + encodeURIComponent(AFFILIATE_URL) + ";end";
+
+      var iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      // Use location to try the intent
+      var start = Date.now();
+      try {
+        window.location = intentURL;
+      } catch(e) {}
+
+      // If app opened, user is gone. If not, show buttons after 2s
+      setTimeout(function() {
+        var elapsed = Date.now() - start;
+        if (elapsed < 3000) {
+          showButtons();
+        }
+      }, 2000);
+
+    } else if (isIOS) {
+      // On iOS, amzn.to links open in Amazon app automatically IF the app is installed
+      // (Universal Links). Just redirect.
+      window.location.href = AFFILIATE_URL;
+
+      // Show fallback buttons after 2 seconds if nothing happened
+      setTimeout(showButtons, 2000);
+
+    } else {
+      // Desktop — just go directly
+      window.location.href = AFFILIATE_URL;
+    }
+  }
+
+  // Start the deep link attempt after a brief moment (so user sees the UI)
+  setTimeout(tryDeepLink, 800);
+</script>
+
+</body>
+</html>
